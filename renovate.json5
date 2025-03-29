@@ -28,6 +28,11 @@
             allowedVersions: "*"
         },
         {
+            matchDepNames: ["roslynv4"],
+            allowedVersions: "<=4.0"
+        },
+
+        {
             matchDepNames: ["rzls"],
             allowedVersions: "*"
         },
