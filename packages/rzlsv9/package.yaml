@@ -10,7 +10,7 @@ languages:
 categories:
   - LSP
 source:
-  id: pkg:github/Crashdummyy/rzls@9.0.0-preview.25156.2
+  id: pkg:github/Crashdummyy/rzls@9.0.0-preview.25211.4
   asset:
     - target: darwin_x64
       file: rzls.osx-x64.zip:libexec/
