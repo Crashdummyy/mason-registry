@@ -13,7 +13,7 @@ jobs:
       - name: Check for open PRs
         id: check
         run: |
-          prs=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN_RW }}" \
+          prs=$(curl -s -H "Authorization: token ${{ secrets.RW_GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls?state=open")
           count=$(echo "$prs" | jq length)
           echo "Found $count open pull requests"
@@ -39,7 +39,7 @@ jobs:
 
       - name: Assert stable releases are frozen ( prevent cleanup )
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_RW }}
+          GITHUB_TOKEN: ${{ secrets.RW_GITHUB_TOKEN }}
         run: |
           roslynFrozen=$(gh variable get FROZENRELEASES -R Crashdummyy/roslynLanguageServer)
           rzlsFrozen=$(gh variable get FROZENRELEASES -R Crashdummyy/rzls)
@@ -61,7 +61,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: master
-          token: ${{ secrets.GITHUB_TOKEN_RW }}
+          token: ${{ secrets.RW_GITHUB_TOKEN }}
 
       - name: Configure git
         run: |
@@ -78,7 +78,7 @@ jobs:
 
       - name: Update unstables
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_RW }}
+          GITHUB_TOKEN: ${{ secrets.RW_GITHUB_TOKEN }}
         working-directory: packages
         run: |
           latestRoslyn=$(gh release view -R crashdummyy/roslynLanguageServer --json tagName -q .tagName)
@@ -89,7 +89,7 @@ jobs:
 
       - name: Create PR if required
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_RW }}
+          GITHUB_TOKEN: ${{ secrets.RW_GITHUB_TOKEN }}
         run: |
           if [[ $(git diff --name-only | wc -l) -gt 0 ]];then
             echo "detected changes";
