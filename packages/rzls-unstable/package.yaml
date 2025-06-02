@@ -11,7 +11,7 @@ categories:
   - LSP
 source:
   # renovate:versioning=loose
-  id: pkg:github/Crashdummyy/rzls@10.0.0-preview.25262.1
+  id: pkg:github/Crashdummyy/rzls@10.0.0-preview.25279.1
   asset:
     - target: darwin_x64
       file: rzls.osx-x64.zip:libexec/
