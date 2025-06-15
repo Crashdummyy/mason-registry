@@ -53,7 +53,7 @@ jobs:
           if [[ "$rzlsFrozen" = *"${{ steps.vscode.outputs.rzls }}"* ]];then
             echo "rzls stable is still unchanged"
           else
-            gh variable set FROZENRELEASES --body "${rzlsFrozen};${{ steps.vscode.outputs.rzls }}" -R Crashdummyy/roslynLanguageServer
+            gh variable set FROZENRELEASES --body "${rzlsFrozen};${{ steps.vscode.outputs.rzls }}" -R Crashdummyy/rzls
           fi
 
       - name: Checkout the code
