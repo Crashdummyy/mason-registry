@@ -5,29 +5,8 @@ on:
     - cron: "1 */12 * * *"
 
 jobs:
-  check-open-prs:
-    runs-on: ubuntu-latest
-    outputs:
-      hasOpenPrs: ${{ steps.check.outputs.hasOpenPrs }}
-    steps:
-      - name: Check for open PRs
-        id: check
-        run: |
-          prs=$(curl -s -H "Authorization: token ${{ secrets.RW_GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls?state=open")
-          count=$(echo "$prs" | jq length)
-          echo "Found $count open pull requests"
-          if [[ "$count" -gt 0 ]]; then
-            echo "Detected open prs. Automatic updates will be skipped"
-            echo "hasOpenPrs=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "hasOpenPrs=false" >> "$GITHUB_OUTPUT"
-          fi
-
   renovate:
     runs-on: ubuntu-latest
-    needs: check-open-prs
-    if: needs.check-open-prs.outputs.hasOpenPrs == 'false'
     steps:
       - name: Get vscode-csharp releases
         id: vscode
@@ -99,7 +78,8 @@ jobs:
             git commit -m "Renovate"
             git push -u origin HEAD
 
-            gh pr create --title "Renovate updates" --body "General system stability improvements to enhance the users experience"
+            gh pr create --title "Daily Updates" --body "General system stability improvements to enhance the users experience"
+            gh pr merge --auto -d -s &> /dev/null || echo "No automerge -.-"
           else
             echo "No updates detected. Skipping PR"
             exit 0
