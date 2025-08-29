@@ -47,7 +47,6 @@ jobs:
           git config user.name Crashdummyy
           git config user.email Simon.Schwendele@gmx.de
           git config http.sslVerify false
-          git checkout -b "updates_${{ github.run_id }}"
 
       - name: Update stables
         working-directory: packages
@@ -75,11 +74,8 @@ jobs:
             git diff --name-only
 
             git add "./packages"
-            git commit -m "Renovate"
+            git commit -m "Daily updates"
             git push -u origin HEAD
-
-            gh pr create --title "Daily Updates" --body "General system stability improvements to enhance the users experience"
-            gh pr merge --auto -d -s &> /dev/null || echo "No automerge -.-"
           else
             echo "No updates detected. Skipping PR"
             exit 0
