@@ -10,7 +10,7 @@ languages:
 categories:
   - LSP
 source:
-  id: pkg:github/Crashdummyy/roslynLanguageServer@5.1.0-1.25473.11
+  id: pkg:github/Crashdummyy/roslynLanguageServer@5.1.0-1.25474.13
   asset:
     - target: darwin_x64
       file: microsoft.codeanalysis.languageserver.osx-x64.zip:libexec/
