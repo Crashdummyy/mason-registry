@@ -21,7 +21,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RW_GITHUB_TOKEN }}
         run: |
           roslynFrozen=$(gh variable get FROZENRELEASES -R Crashdummyy/roslynLanguageServer)
-          rzlsFrozen=$(gh variable get FROZENRELEASES -R Crashdummyy/rzls)
 
           if [[ "$roslynFrozen" = *"${{ steps.vscode.outputs.roslyn }}"* ]];then
             echo "roslyn stable is still unchanged"
@@ -29,14 +28,8 @@ jobs:
             gh variable set FROZENRELEASES --body "${roslynFrozen};${{ steps.vscode.outputs.roslyn }}" -R Crashdummyy/roslynLanguageServer
           fi
 
-          if [[ "$rzlsFrozen" = *"${{ steps.vscode.outputs.rzls }}"* ]];then
-            echo "rzls stable is still unchanged"
-          else
-            gh variable set FROZENRELEASES --body "${rzlsFrozen};${{ steps.vscode.outputs.rzls }}" -R Crashdummyy/rzls
-          fi
-
       - name: Checkout the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: master
@@ -52,7 +45,6 @@ jobs:
         working-directory: packages
         run: |
           sed -i "s|roslynLanguageServer\@.*|roslynLanguageServer\@${{ steps.vscode.outputs.roslyn }}|"  roslyn/package.yaml
-          sed -i "s|rzls\@.*|rzls\@${{ steps.vscode.outputs.rzls }}|"  rzls/package.yaml
 
       - name: Update unstables
         env:
@@ -60,12 +52,9 @@ jobs:
         working-directory: packages
         run: |
           latestRoslyn=$(gh release view -R crashdummyy/roslynLanguageServer --json tagName -q .tagName)
-          latestRzls=$(gh release view -R crashdummyy/rzls --json tagName -q .tagName)
-
           sed -i "s|roslynLanguageServer\@.*|roslynLanguageServer\@${latestRoslyn}|"  roslyn-unstable/package.yaml
-          sed -i "s|rzls\@.*|rzls\@${latestRzls}|"  rzls-unstable/package.yaml
 
-      - name: Create PR if required
+      - name: Commit changes
         env:
           GITHUB_TOKEN: ${{ secrets.RW_GITHUB_TOKEN }}
         run: |
