@@ -10,6 +10,9 @@ languages:
   - C#
 categories:
   - LSP
+deprecation:
+  message: Part of of roslyn since 5.3.0-2.25604.5.
+  since: 10.0.0-preview.25564.2
 source:
   # renovate:versioning=loose
   id: pkg:github/Crashdummyy/rzls@10.0.0-preview.25564.2
