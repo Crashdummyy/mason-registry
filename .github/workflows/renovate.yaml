@@ -41,10 +41,10 @@ jobs:
           git config user.email Simon.Schwendele@gmx.de
           git config http.sslVerify false
 
-      - name: Update stables
-        working-directory: packages
-        run: |
-          sed -i "s|roslynLanguageServer\@.*|roslynLanguageServer\@${{ steps.vscode.outputs.roslyn }}|"  roslyn/package.yaml
+      # - name: Update stables
+      #   working-directory: packages
+      #   run: |
+      #     sed -i "s|roslynLanguageServer\@.*|roslynLanguageServer\@${{ steps.vscode.outputs.roslyn }}|"  roslyn/package.yaml
 
       - name: Update unstables
         env:
