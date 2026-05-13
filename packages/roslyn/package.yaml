@@ -27,3 +27,4 @@ source:
       file: microsoft.codeanalysis.languageserver.win-arm64.zip:libexec/
 bin:
   roslyn: dotnet:libexec/Microsoft.CodeAnalysis.LanguageServer.dll
+  roslyn-language-server: libexec/Microsoft.CodeAnalysis.LanguageServer
