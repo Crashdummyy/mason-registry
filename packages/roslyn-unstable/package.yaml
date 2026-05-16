@@ -10,20 +10,27 @@ languages:
 categories:
   - LSP
 source:
-  id: pkg:github/Crashdummyy/roslynLanguageServer@5.8.0-1.26264.10
+  id: pkg:github/Crashdummyy/roslynLanguageServer@5.8.0-1.26265.8
   asset:
     - target: darwin_x64
       file: microsoft.codeanalysis.languageserver.osx-x64.zip:libexec/
+      bin: libexec/Microsoft.CodeAnalysis.LanguageServer
     - target: darwin_arm64
       file: microsoft.codeanalysis.languageserver.osx-arm64.zip:libexec/
+      bin: libexec/Microsoft.CodeAnalysis.LanguageServer
     - target: linux_x64
       file: microsoft.codeanalysis.languageserver.linux-x64.zip:libexec/
+      bin: libexec/Microsoft.CodeAnalysis.LanguageServer
     - target: linux_arm64
       file: microsoft.codeanalysis.languageserver.linux-arm64.zip:libexec/
+      bin: libexec/Microsoft.CodeAnalysis.LanguageServer
     - target: win_x64
       file: microsoft.codeanalysis.languageserver.win-x64.zip:libexec/
+      bin: libexec/Microsoft.CodeAnalysis.LanguageServer.exe
     - target: win_arm64
       file: microsoft.codeanalysis.languageserver.win-arm64.zip:libexec/
+      bin: libexec/Microsoft.CodeAnalysis.LanguageServer.exe
+
 bin:
   roslyn: dotnet:libexec/Microsoft.CodeAnalysis.LanguageServer.dll
-  roslyn-language-server: libexec/Microsoft.CodeAnalysis.LanguageServer
+  roslyn-language-server: "{{source.asset.bin}}"
