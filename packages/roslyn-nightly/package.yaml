@@ -1,7 +1,9 @@
 ---
-name: roslyn-unstable
+name: roslyn-nightly
 description: |
-  The Roslyn .NET compiler provides C# and Visual Basic languages with rich code analysis APIs
+  The Roslyn .NET compiler provides C# and Visual Basic languages with rich code analysis APIs.
+  This version tracks the latest updates on azure.
+  https://dev.azure.com/azure-public/vside/_artifacts/feed/vs-impl/NuGet/roslyn-language-server.linux-x64
 homepage: https://github.com/dotnet/roslyn
 licenses:
   - MIT
@@ -9,9 +11,6 @@ languages:
   - C#
 categories:
   - LSP
-deprecation:
-  since: "2026-05-30"
-  message: roslyn-unstable is now roslyn-nightly. This package will be removed Sep-2026.
 source:
   id: pkg:github/Crashdummyy/roslynLanguageServer@5.9.0-1.26279.9
   asset:

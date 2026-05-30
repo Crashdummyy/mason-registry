@@ -12,9 +12,7 @@ jobs:
         id: vscode
         run: |
           versionlist=$(curl https://raw.githubusercontent.com/dotnet/vscode-csharp/refs/heads/main/package.json | jq '.["defaults"]')
-
           echo "roslyn=$(echo $versionlist | jq '.["roslyn"]' | cut -d '"' -f2)" >> "$GITHUB_OUTPUT"
-          echo "rzls=$(echo $versionlist | jq '.["razor"]' | cut -d '"' -f2)" >> "$GITHUB_OUTPUT"
 
       - name: Assert stable releases are frozen ( prevent cleanup )
         env:
@@ -46,13 +44,13 @@ jobs:
         run: |
           sed -i "s|roslynLanguageServer\@.*|roslynLanguageServer\@${{ steps.vscode.outputs.roslyn }}|"  roslyn/package.yaml
 
-      - name: Update unstables
+      - name: Update nightly
         env:
           GITHUB_TOKEN: ${{ secrets.RW_GITHUB_TOKEN }}
         working-directory: packages
         run: |
           latestRoslyn=$(gh release view -R crashdummyy/roslynLanguageServer --json tagName -q .tagName)
-          sed -i "s|roslynLanguageServer\@.*|roslynLanguageServer\@${latestRoslyn}|"  roslyn-unstable/package.yaml
+          sed -i "s|roslynLanguageServer\@.*|roslynLanguageServer\@${latestRoslyn}|"  roslyn-nightly/package.yaml
 
       - name: Commit changes
         env:
@@ -69,4 +67,3 @@ jobs:
             echo "No updates detected. Skipping PR"
             exit 0
           fi
-
