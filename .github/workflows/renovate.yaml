@@ -7,23 +7,26 @@ on:
 jobs:
   renovate:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.RW_GITHUB_TOKEN }}
+      RELEASE_REPO: Crashdummyy/roslynLanguageServer
     steps:
-      - name: Get vscode-csharp releases
+      - name: Get vscode-csharp roslyn version
         id: vscode
         run: |
-          versionlist=$(curl https://raw.githubusercontent.com/dotnet/vscode-csharp/refs/heads/main/package.json | jq '.["defaults"]')
-          echo "roslyn=$(echo $versionlist | jq '.["roslyn"]' | cut -d '"' -f2)" >> "$GITHUB_OUTPUT"
+          roslyn=$(curl -fsSL https://raw.githubusercontent.com/dotnet/vscode-csharp/refs/heads/main/package.json | jq -er '.defaults.roslyn')
+          echo "roslyn=$roslyn" >> "$GITHUB_OUTPUT"
 
-      - name: Assert stable releases are frozen ( prevent cleanup )
+      - name: Assert stable release is frozen ( prevent cleanup )
         env:
-          GITHUB_TOKEN: ${{ secrets.RW_GITHUB_TOKEN }}
+          STABLE: ${{ steps.vscode.outputs.roslyn }}
         run: |
-          roslynFrozen=$(gh variable get FROZENRELEASES -R Crashdummyy/roslynLanguageServer)
+          frozen=$(gh variable get FROZENRELEASES -R "$RELEASE_REPO")
 
-          if [[ "$roslynFrozen" = *"${{ steps.vscode.outputs.roslyn }}"* ]];then
-            echo "roslyn stable is still unchanged"
+          if [[ ";$frozen;" == *";$STABLE;"* ]]; then
+            echo "$STABLE is already frozen"
           else
-            gh variable set FROZENRELEASES --body "${roslynFrozen};${{ steps.vscode.outputs.roslyn }}" -R Crashdummyy/roslynLanguageServer
+            gh variable set FROZENRELEASES --body "$frozen;$STABLE" -R "$RELEASE_REPO"
           fi
 
       - name: Checkout the code
@@ -39,22 +42,41 @@ jobs:
           git config user.email Simon.Schwendele@gmx.de
           git config http.sslVerify false
 
-      - name: Update stables
+      - name: Update packages
         working-directory: packages
-        run: |
-          sed -i "s|roslynLanguageServer\@.*|roslynLanguageServer\@${{ steps.vscode.outputs.roslyn }}|"  roslyn/package.yaml
-
-      - name: Update nightly
         env:
-          GITHUB_TOKEN: ${{ secrets.RW_GITHUB_TOKEN }}
-        working-directory: packages
+          STABLE: ${{ steps.vscode.outputs.roslyn }}
         run: |
-          latestRoslyn=$(gh release view -R crashdummyy/roslynLanguageServer --json tagName -q .tagName)
-          sed -i "s|roslynLanguageServer\@.*|roslynLanguageServer\@${latestRoslyn}|"  roslyn-nightly/package.yaml
+          required_assets() {
+            grep -oP 'file: \K[^:]+' "$1" | sort -u
+          }
+
+          release_is_complete() {
+            local tag=$1 package=$2 published
+            published=$(gh release view "$tag" -R "$RELEASE_REPO" --json assets -q '.assets[].name') || return 1
+            [[ -z $(comm -23 <(required_assets "$package") <(sort -u <<< "$published")) ]]
+          }
+
+          set_version() {
+            sed -i "s|roslynLanguageServer@.*|roslynLanguageServer@$2|" "$1"
+          }
+
+          if release_is_complete "$STABLE" roslyn/package.yaml; then
+            set_version roslyn/package.yaml "$STABLE"
+          else
+            echo "::warning::Stable $STABLE is not (completely) released in $RELEASE_REPO yet, keeping current version"
+          fi
+
+          tags=$(gh release list -R "$RELEASE_REPO" --exclude-drafts --json tagName -q '.[].tagName')
+          for tag in $(sort -Vr <<< "$tags"); do
+            if release_is_complete "$tag" roslyn-nightly/package.yaml; then
+              set_version roslyn-nightly/package.yaml "$tag"
+              break
+            fi
+            echo "Skipping incomplete release $tag"
+          done
 
       - name: Commit changes
-        env:
-          GITHUB_TOKEN: ${{ secrets.RW_GITHUB_TOKEN }}
         run: |
           if [[ $(git diff --name-only | wc -l) -gt 0 ]];then
             echo "detected changes";
